@@ -1,0 +1,1176 @@
+<!-- ============================================================================
+     Lead Hunter sales page. Tailwind v3+.
+     Drop this whole block in. It carries a scoped style tag (everything is
+     namespaced under #lh, nothing leaks into the host page) and one small script
+     for scroll reveals, which degrades to fully visible if it never runs.
+     Slots to fill: the DEMO GIF frame in the hero, the two CTA hrefs,
+     the support address in the last FAQ answer.
+     ============================================================================ -->
+<div id="lh" class="relative overflow-hidden bg-[#08080a] text-neutral-100 antialiased selection:bg-lime-300 selection:text-neutral-950">
+
+<style>
+  #lh{ --lh-acc:#b6ff3d; }
+  #lh .lh-grid{
+    background-image:linear-gradient(rgba(255,255,255,.045) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,255,255,.045) 1px,transparent 1px);
+    background-size:74px 74px;
+    -webkit-mask-image:radial-gradient(ellipse 90% 55% at 50% 0%,#000,transparent 78%);
+            mask-image:radial-gradient(ellipse 90% 55% at 50% 0%,#000,transparent 78%);
+  }
+  #lh .lh-noise{
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+    opacity:.03;mix-blend-mode:overlay;
+  }
+  /* hairline gradient edge, the thing that makes a card look built rather than boxed */
+  #lh .lh-edge{position:relative}
+  #lh .lh-edge::before{
+    content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;
+    background:linear-gradient(180deg,rgba(255,255,255,.22),rgba(255,255,255,.04) 40%,rgba(255,255,255,0));
+    -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+            mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+    -webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;
+  }
+  #lh .lh-edge-acc::before{background:linear-gradient(180deg,rgba(182,255,61,.55),rgba(182,255,61,.10) 45%,rgba(182,255,61,0))}
+  #lh .lh-rise{opacity:0;transform:translateY(22px);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1)}
+  #lh .lh-rise.in{opacity:1;transform:none}
+  #lh .lh-step-line{background:linear-gradient(90deg,rgba(182,255,61,.5),rgba(182,255,61,.08))}
+  /* demo player */
+  #lh .lh-d{opacity:0;transform:translateY(6px);transition:opacity .34s ease,transform .34s ease}
+  #lh .lh-d.on{opacity:1;transform:none}
+  #lh .lh-caret{display:inline-block;width:7px;height:1em;background:#b6ff3d;vertical-align:-2px;margin-left:2px;animation:lhBlink 1.05s steps(1) infinite}
+  #lh .lh-caret.idle{animation:none;opacity:.25}
+  @keyframes lhBlink{50%{opacity:0}}
+  #lh .lh-stage{transition:opacity .45s ease}
+  #lh .lh-tab{border-color:rgba(255,255,255,.10);background:rgba(255,255,255,.02);color:#a3a3ad}
+  #lh .lh-tab:hover{border-color:rgba(255,255,255,.24);color:#f5f5f7}
+  #lh .lh-tab[aria-selected="true"]{border-color:rgba(182,255,61,.45);background:rgba(182,255,61,.10);color:#b6ff3d}
+  /* a strike that draws itself, so the page shows the filtering instead of describing it */
+  #lh .lh-strike{background-image:linear-gradient(#ff6b6b,#ff6b6b);background-repeat:no-repeat;
+    background-position:0 56%;background-size:0% 1px;transition:background-size .55s ease .1s}
+  #lh [data-seq-item].on .lh-strike{background-size:100% 1px}
+  #lh [data-seq-item]{opacity:0;transform:translateX(-6px);transition:opacity .4s ease,transform .4s ease}
+  #lh [data-seq-item].on{opacity:1;transform:none}
+  #lh [data-bar]{width:0;transition:width .9s cubic-bezier(.22,.61,.36,1)}
+  #lh [data-row]{opacity:0;transform:translateY(8px);transition:opacity .45s ease,transform .45s ease}
+  #lh [data-row].on{opacity:1;transform:none}
+  #lh .lh-pulse{position:relative}
+  #lh .lh-pulse::after{content:"";position:absolute;inset:-4px;border-radius:9999px;
+    border:1px solid rgba(182,255,61,.6);animation:lhPulse 2.2s ease-out infinite}
+  @keyframes lhPulse{0%{transform:scale(.7);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+  #lh .lh-bar{position:fixed;left:0;right:0;bottom:0;z-index:60;transform:translateY(110%);
+    transition:transform .32s cubic-bezier(.22,.61,.36,1);
+    background:rgba(8,8,10,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    border-top:1px solid rgba(182,255,61,.22);box-shadow:0 -20px 50px -30px rgba(0,0,0,1)}
+  #lh .lh-bar.on{transform:none}
+  #lh .lh-sheen{position:relative;overflow:hidden}
+  #lh .lh-sheen::after{
+    content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;pointer-events:none;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);
+    transform:skewX(-18deg);animation:lhSheen 4.2s ease-in-out infinite;
+  }
+  @keyframes lhSheen{0%,62%{left:-60%}100%{left:130%}}
+  @media (prefers-reduced-motion:reduce){
+    #lh .lh-sheen::after{display:none}
+    #lh .lh-pulse::after{animation:none}
+    #lh [data-seq-item]{opacity:1;transform:none}
+    #lh [data-row]{opacity:1;transform:none}
+    #lh .lh-d{opacity:1;transform:none;transition:none}
+    #lh .lh-caret{animation:none;opacity:.3}
+  }
+  @media (prefers-reduced-motion:reduce){
+    #lh .lh-rise{opacity:1;transform:none;transition:none}
+  }
+</style>
+
+<!-- ambient layers -->
+<div aria-hidden="true" class="pointer-events-none absolute inset-0 lh-grid"></div>
+<div aria-hidden="true" class="pointer-events-none absolute inset-x-0 top-0 h-[900px]
+     bg-[radial-gradient(46rem_28rem_at_72%_-8%,rgba(182,255,61,.16),transparent_62%),radial-gradient(38rem_24rem_at_4%_2%,rgba(122,124,255,.10),transparent_60%)]"></div>
+<div aria-hidden="true" class="pointer-events-none absolute inset-0 lh-noise"></div>
+
+<div class="relative">
+
+  <!-- ========================= 1. HERO ========================= -->
+  <section class="mx-auto flex max-w-6xl flex-col px-5 pt-10 pb-8 sm:px-8 sm:pt-20 sm:pb-14">
+    <p class="lh-rise order-1 mb-5 inline-flex self-start items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-[11px] font-medium uppercase tracking-[0.1em] text-neutral-400 sm:mb-6 sm:px-4 sm:text-[11px] sm:tracking-[0.16em]">
+      <span class="h-1.5 w-1.5 shrink-0 rounded-full bg-lime-300 shadow-[0_0_10px_rgba(182,255,61,.9)]"></span>
+      <span class="sm:hidden">An Excel list of local businesses</span>
+      <span class="hidden sm:inline">An Excel list of local businesses, checked before you open it</span>
+    </p>
+
+    <h1 class="lh-rise order-2 max-w-4xl text-[2.05rem] font-semibold leading-[1.06] tracking-[-0.035em] sm:text-6xl sm:leading-[0.99] sm:tracking-[-0.042em] lg:text-[4.7rem]">
+      Every scraper hands you a raw dump.<br class="hidden sm:block">
+      This one reads the contact page and asks DNS
+      <span class="bg-gradient-to-br from-lime-200 to-lime-400 bg-clip-text text-transparent">before it writes the row.</span>
+    </h1>
+
+    <p class="lh-rise order-3 mt-5 max-w-2xl text-[17px] leading-relaxed text-neutral-400 sm:mt-6 sm:text-xl">
+      <span class="sm:hidden">One trade, one city, in the local language. It reads each business's
+        contact page and drops every address that cannot receive mail. Excel and CSV, on your desktop.</span>
+      <span class="hidden sm:inline">You name one trade and one city, and it searches in that
+        country's own language. It reads each business's contact page, finds the addresses hidden
+        behind Cloudflare, and asks DNS about every one before it keeps it. Excel and CSV, on your
+        desktop.</span>
+    </p>
+
+    <div class="lh-rise order-6 mt-6 flex flex-col items-start gap-2.5 text-sm text-neutral-400 sm:order-4 sm:mt-7 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-3 sm:gap-y-2">
+      <span>You run it inside</span>
+      <span class="flex flex-wrap items-center gap-2.5 sm:contents">
+      <span class="inline-flex items-center gap-2 rounded-xl border border-lime-300/30 bg-lime-300/10 px-3 py-1.5 font-medium text-lime-300">
+        <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 9 3 3-3 3M13 15h4"/><rect x="2.5" y="4" width="19" height="16" rx="3"/></svg>
+        Claude Code
+      </span>
+      <span class="inline-flex items-center gap-2 rounded-xl border border-lime-300/30 bg-lime-300/10 px-3 py-1.5 font-medium text-lime-300">
+        <svg aria-hidden="true" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 9 3 3-3 3M13 15h4"/><rect x="2.5" y="4" width="19" height="16" rx="3"/></svg>
+        Codex
+      </span>
+      </span>
+      <span class="text-[#8f8f96]">or a terminal, if you prefer one</span>
+    </div>
+
+    <div class="lh-rise order-4 mt-7 flex flex-col gap-3 sm:order-5 sm:mt-8 sm:flex-row sm:items-center">
+      <!-- checkout -->
+      <a href="https://buy.stripe.com/8x2fZi2LK5ri2g1eKIgA800"
+         class="lh-sheen group inline-flex items-center justify-center gap-2 rounded-2xl bg-lime-300 px-7 py-4 text-base font-semibold text-neutral-950 shadow-[0_16px_40px_-18px_rgba(182,255,61,.8)] transition hover:-translate-y-0.5 hover:bg-lime-200">
+        Get Lead Hunter, $67
+        <svg aria-hidden="true" class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <a href="#what-you-get"
+         class="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/[0.03] px-7 py-4 text-base font-semibold transition hover:-translate-y-0.5 hover:border-white/40">
+        See what is in the $67
+      </a>
+    </div>
+
+    <!-- hero visual: the demo frame -->
+    <figure class="lh-rise relative order-5 mt-8 sm:order-7 sm:mt-12">
+      <div aria-hidden="true" class="absolute -inset-x-10 -top-8 bottom-10 rounded-[3rem] bg-lime-300/[0.07] blur-3xl"></div>
+      <div class="lh-edge relative overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/80 shadow-[0_50px_120px_-50px_rgba(0,0,0,1)]">
+        <div class="flex items-center gap-2 border-b border-white/10 bg-white/[0.03] px-3 py-3 sm:px-4">
+          <span class="h-3 w-3 rounded-full bg-[#ff5f57]"></span>
+          <span class="h-3 w-3 rounded-full bg-[#febc2e]"></span>
+          <span class="h-3 w-3 rounded-full bg-[#28c840]"></span>
+          <span class="ml-2 font-mono text-[11px] text-[#8f8f96] sm:ml-3">lead-hunter</span>
+          <span class="ml-auto inline-flex items-center gap-2 rounded-full border border-lime-300/30 bg-lime-300/10 px-2.5 py-0.5 font-mono text-[10px] text-lime-300">
+            <span class="lh-pulse inline-block h-1.5 w-1.5 rounded-full bg-lime-300"></span>example run</span>
+        </div>
+
+        <!-- ==================== THE DEMO ====================
+             This is the animated demo, built in HTML so it stays sharp, adapts to
+             the phone, and costs nothing to load. If you would rather show a real
+             screen recording, replace this whole block with:
+             <img src="demo.gif" alt="Lead Hunter running a search" class="w-full">
+             ================================================== -->
+        <div id="lh-demo" class="relative bg-[radial-gradient(70%_60%_at_50%_0%,rgba(182,255,61,.05),transparent)]">
+          <div class="lh-stage min-h-[330px] p-4 font-mono text-[11.5px] leading-relaxed sm:min-h-[420px] sm:p-6 sm:text-[13px]">
+
+            <p class="text-neutral-300"><span class="text-lime-300">&gt;</span>
+              <span id="lh-type"></span><span id="lh-caret" class="lh-caret"></span></p>
+
+            <div class="mt-4 space-y-1.5 sm:mt-5 sm:space-y-2">
+              <p class="lh-d text-neutral-400" data-d="0"><span class="text-lime-300">&#10003;</span>
+                pack <span class="text-neutral-200">DE</span> &middot; barber
+                <span class="text-[#7c7c85]">&#8594;</span> <span class="text-lime-200">friseur</span></p>
+              <p class="lh-d text-neutral-400" data-d="1"><span class="text-lime-300">&#10003;</span>
+                searching the local web</p>
+              <p class="lh-d text-neutral-400" data-d="2"><span class="text-lime-300">&#10003;</span>
+                <span class="text-neutral-200">hundreds</span> found &middot; dropping chains, role mailboxes, dead domains</p>
+              <p class="lh-d text-neutral-400" data-d="3"><span class="text-lime-300">&#10003;</span>
+                asking DNS which domains can receive mail</p>
+              <p class="lh-d text-neutral-400" data-d="4"><span class="text-lime-300">&#10003;</span>
+                scoring and sorting what is left</p>
+            </div>
+
+            <div class="lh-d mt-4 overflow-hidden rounded-xl border border-white/10 bg-black/40 sm:mt-5" data-d="5">
+              <div class="flex items-center gap-2 border-b border-white/10 px-3 py-2 text-[10px] text-[#8f8f96]">
+                <span class="text-lime-300">&#9635;</span> barbers-munich.xlsx
+                <span class="ml-auto hidden sm:inline">first rows</span>
+              </div>
+              <table class="w-full border-collapse text-[10.5px] sm:text-[12px]">
+                <tbody>
+                  <tr class="lh-d" data-d="6">
+                    <td class="px-3 py-1.5 text-neutral-200">Barbier Schwabing</td>
+                    <td class="hidden px-3 py-1.5 text-lime-200/70 sm:table-cell">kontakt@barbier-schwabing.de</td>
+                    <td class="px-3 py-1.5 text-right"><span class="rounded bg-lime-300/15 px-1.5 py-0.5 font-bold text-lime-300" data-score="92">0</span></td>
+                  </tr>
+                  <tr class="lh-d" data-d="7">
+                    <td class="px-3 py-1.5 text-neutral-200">Herrensalon Giesing</td>
+                    <td class="hidden px-3 py-1.5 text-lime-200/70 sm:table-cell">post@herrensalon-giesing.de</td>
+                    <td class="px-3 py-1.5 text-right"><span class="rounded bg-lime-300/12 px-1.5 py-0.5 font-bold text-lime-200" data-score="78">0</span></td>
+                  </tr>
+                  <tr class="lh-d" data-d="8">
+                    <td class="px-3 py-1.5 text-neutral-200">Haarwerk Maxvorstadt</td>
+                    <td class="hidden px-3 py-1.5 text-lime-200/70 sm:table-cell">info@haarwerk-maxvorstadt.de</td>
+                    <td class="px-3 py-1.5 text-right"><span class="rounded bg-lime-300/12 px-1.5 py-0.5 font-bold text-lime-200" data-score="74">0</span></td>
+                  </tr>
+                  <tr class="lh-d" data-d="9">
+                    <td class="px-3 py-1.5 text-neutral-200">Klipp Sendling</td>
+                    <td class="hidden px-3 py-1.5 text-[#7c7c85] sm:table-cell">no website</td>
+                    <td class="px-3 py-1.5 text-right"><span class="rounded bg-white/[0.07] px-1.5 py-0.5 font-bold text-neutral-400" data-score="61">0</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p class="lh-d mt-4 text-lime-300 sm:mt-5" data-d="10">&#10003; done &middot; top 20 profiles written</p>
+          </div>
+        </div>
+      </div>
+      <figcaption class="mt-4 text-sm text-[#8f8f96]">
+        The whole run in Claude Code, start to finish: one sentence in, a scored spreadsheet out.
+      </figcaption>
+    </figure>
+
+    <!-- proof chips -->
+    <ul class="lh-rise order-7 mt-8 grid grid-cols-2 gap-2.5 sm:order-8 sm:mt-10 sm:flex sm:flex-wrap">
+      <li class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-center text-sm text-neutral-300 sm:text-left">No API keys</li>
+      <li class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-center text-sm text-neutral-300 sm:text-left">No subscription</li>
+      <li class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-center text-sm text-neutral-300 sm:text-left">21 country profiles</li>
+      <li class="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-2.5 text-center text-sm text-neutral-300 sm:text-left">14-day refund</li>
+    </ul>
+  </section>
+
+  <!-- ========================= THE PAYOFF ========================= -->
+  <section class="border-t border-white/10">
+    <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-24">
+      <div class="lh-rise max-w-3xl">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">01 / what lands on your desktop</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+          You get the list. Then it goes further and
+          <span class="text-lime-300">profiles the twenty best rows in it.</span>
+        </h2>
+        <p class="mt-5 text-lg text-neutral-400">
+          The Excel file is the product. This is what the scraper adds on top of it, for the
+          twenty rows worth your morning. Real output, only the business is anonymised.
+        </p>
+      </div>
+
+      <div class="lh-rise lh-edge mt-10 grid gap-6 overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/70 lg:grid-cols-[1.25fr_1fr]">
+        <div class="p-6 font-mono text-[12.5px] leading-relaxed sm:p-8 sm:text-[13px]">
+          <p class="text-[#8f8f96]">## 01 / 20 &middot; <span class="text-lime-300">&#128293; 94</span> &middot; [salon, anonymised]</p>
+          <p class="mt-1 text-[#7c7c85]">&#128205; Osijek, HR &nbsp;&middot;&nbsp; &#9993; [email] &nbsp;&middot;&nbsp; &#9742; [phone]</p>
+
+          <p class="mt-6 font-semibold text-neutral-100">Digital audit</p>
+          <ul class="mt-2 space-y-1 text-neutral-400">
+            <li>Website loads: <span class="text-lime-300">yes</span> &middot; HTTPS: <span class="text-lime-300">yes</span> &middot; Mobile-friendly: <span class="text-red-400">no</span></li>
+            <li>Last updated (&copy; year): 2022 <span class="text-amber-300">&#9888; 4 yrs old</span></li>
+            <li>Contact form: <span class="text-red-400">none found</span> &middot; Social links: none found</li>
+            <li>Reviews, ratings, revenue, staff size: <span class="text-amber-300">&#9888; not verified</span>, no reliable public source</li>
+          </ul>
+
+          <p class="mt-6 font-semibold text-neutral-100">3 ways they are losing money</p>
+          <ul class="mt-2 space-y-1 text-neutral-400">
+            <li>No mobile layout. Most local searches happen on a phone, and a broken phone view means lost bookings every day.</li>
+            <li>The site has not been touched in years. It signals "maybe closed" and quietly loses trust.</li>
+            <li>No contact or booking form. Interested visitors have no easy way to get in touch and drop off.</li>
+          </ul>
+
+          <p class="mt-6 font-semibold text-neutral-100">Pitch angle</p>
+          <ul class="mt-2 space-y-1 text-neutral-400">
+            <li>Their site is broken on phones. A modern, mobile-first rebuild is an easy yes.</li>
+            <li>Sell: <span class="text-neutral-100">a mobile-first redesign</span> &rarr; recommended
+              <span class="rounded bg-lime-300/15 px-1.5 py-0.5 font-bold text-lime-300">&euro;400 to &euro;900</span></li>
+          </ul>
+
+          <p class="mt-6 font-semibold text-neutral-100">When NOT to contact</p>
+          <ul class="mt-2 space-y-1 text-neutral-400">
+            <li>Anything marked <span class="text-amber-300">&#9888;</span> is unverified. Confirm it before you put it in an email.</li>
+          </ul>
+        </div>
+
+        <div class="border-t border-white/10 bg-white/[0.02] p-6 sm:p-8 lg:border-l lg:border-t-0">
+          <p class="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8f8f96]">why this one matters</p>
+          <p class="mt-4 text-[15px] leading-relaxed text-neutral-300">
+            You did not get a row in a spreadsheet. You got the opening line of an email, the reason
+            it is true, the thing to sell, and the number to put in the proposal.
+          </p>
+          <p class="mt-4 text-[15px] leading-relaxed text-neutral-300">
+            Twenty of these come out of one search, and the tool wrote that price range itself.
+          </p>
+          <div class="mt-6 rounded-2xl border border-lime-300/25 bg-lime-300/[0.06] p-5">
+            <p class="text-[13px] leading-relaxed text-neutral-300">
+              And when it cannot check something, it says so. Every
+              <span class="text-amber-300">&#9888;</span> above is the tool refusing to invent a fact.
+            </p>
+          </div>
+          <p class="mt-6 text-xs text-[#8f8f96]">
+            Real output from a run on 27 August. Names and contact details removed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="lh-rise mx-auto max-w-6xl px-5 pb-16 sm:px-8 sm:pb-20">
+    <div class="lh-edge flex flex-col gap-4 rounded-2xl border border-lime-300/20 bg-lime-300/[0.05] p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+      <p class="text-[15px] leading-relaxed text-neutral-300 sm:flex-1">That was one of twenty, and the tool wrote all of them without being asked twice. Sixty-seven dollars, paid once.</p>
+      <!-- checkout -->
+      <a href="https://buy.stripe.com/8x2fZi2LK5ri2g1eKIgA800" class="lh-sheen group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-lime-300 px-6 py-3.5 text-[15px] font-semibold text-neutral-950 transition hover:bg-lime-200 sm:w-auto">
+        Get Lead Hunter, $67
+        <svg aria-hidden="true" class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ========================= 2. THE PROBLEM ========================= -->
+  <section class="border-t border-white/10 bg-black/20">
+    <div class="mx-auto grid max-w-6xl gap-10 px-5 py-14 sm:px-8 sm:py-24 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-16">
+      <div class="lh-rise">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">02 / the problem</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">Building the list by hand</h2>
+        <p class="mt-6 text-lg leading-relaxed text-neutral-400">
+          You open a map, type the trade and the city, and start copying. Then the contact page,
+          because the address is never on the front. Half of it is directories. Most of the rest is
+          info@. Some of the domains died years ago. The morning is gone.
+        </p>
+      </div>
+
+      <div class="lh-rise lh-edge rounded-3xl border border-white/10 bg-neutral-950/60 p-2">
+        <div class="rounded-[1.25rem] bg-black/40 p-5 sm:p-6">
+          <p class="mb-4 font-mono text-[11px] uppercase tracking-[0.16em] text-[#8f8f96]">what the copy-paste hour leaves you</p>
+          <ul class="space-y-3 font-mono text-[13px]" data-seq>
+            <li class="flex items-center gap-3 text-[#7c7c85]" data-seq-item><span class="text-red-400">&#10005;</span><span class="lh-strike">muenchen-branchenbuch.de</span><span class="ml-auto text-[11px] text-red-400/80">directory</span></li>
+            <li class="flex items-center gap-3 text-[#7c7c85]" data-seq-item><span class="text-red-400">&#10005;</span><span class="lh-strike">info@friseur-portal-24.de</span><span class="ml-auto text-[11px] text-red-400/80">aggregator</span></li>
+            <li class="flex items-center gap-3 text-[#7c7c85]" data-seq-item><span class="text-red-400">&#10005;</span><span class="lh-strike">kontakt@salon-offline.de</span><span class="ml-auto text-[11px] text-red-400/80">dead domain</span></li>
+            <li class="flex items-center gap-3 text-neutral-400" data-seq-item><span class="text-[#7c7c85]">?</span><span>info@salon-mitte.de</span><span class="ml-auto text-[11px] text-[#7c7c85]">unverified</span></li>
+          </ul>
+          <p class="mt-5 border-t border-white/10 pt-4 text-xs text-[#8f8f96]">Illustrative, not a real export.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= WHERE YOU RUN IT ========================= -->
+  <section id="run" class="border-t border-white/10 bg-black/20">
+    <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-24">
+      <div class="lh-rise max-w-3xl">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">03 / where you run it</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">
+          Made to live inside <span class="text-lime-300">Claude Code</span> and <span class="text-lime-300">Codex</span>.
+        </h2>
+        <p class="mt-5 text-lg text-neutral-400">
+          You do not learn a tool. You open the folder in the assistant you already have open, and you
+          ask for the city you want. A terminal still works, if that is how you like to work.
+        </p>
+      </div>
+
+      <div class="lh-rise mt-10 grid gap-5 lg:grid-cols-[260px_1fr] lg:gap-8">
+        <div role="tablist" aria-label="Where to run it" class="grid grid-cols-3 gap-2 lg:flex lg:flex-col">
+          <button type="button" role="tab" id="lh-tab-0" data-tab="0" aria-controls="lh-panel-0" aria-selected="true" tabindex="0"
+            class="lh-tab rounded-2xl border px-3 py-3 text-left text-[13px] font-semibold transition sm:px-5 sm:py-4 sm:text-[15px]">
+            Claude Code
+            <span class="mt-0.5 hidden text-xs font-normal opacity-70 sm:block">what most people use</span>
+          </button>
+          <button type="button" role="tab" id="lh-tab-1" data-tab="1" aria-controls="lh-panel-1" aria-selected="false" tabindex="-1"
+            class="lh-tab rounded-2xl border px-3 py-3 text-left text-[13px] font-semibold transition sm:px-5 sm:py-4 sm:text-[15px]">
+            Codex
+            <span class="mt-0.5 hidden text-xs font-normal opacity-70 sm:block">same folder, same sentence</span>
+          </button>
+          <button type="button" role="tab" id="lh-tab-2" data-tab="2" aria-controls="lh-panel-2" aria-selected="false" tabindex="-1"
+            class="lh-tab rounded-2xl border px-3 py-3 text-left text-[13px] font-semibold transition sm:px-5 sm:py-4 sm:text-[15px]">
+            Terminal
+            <span class="mt-0.5 hidden text-xs font-normal opacity-70 sm:block">if you prefer one</span>
+          </button>
+        </div>
+
+        <div class="lh-edge overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/70">
+          <div class="flex items-center gap-2 border-b border-white/10 bg-white/[0.03] px-4 py-3">
+            <span class="h-2.5 w-2.5 rounded-full bg-[#ff5f57]"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-[#febc2e]"></span>
+            <span class="h-2.5 w-2.5 rounded-full bg-[#28c840]"></span>
+            <span class="ml-2 font-mono text-[11px] text-[#8f8f96]" data-tab-title>claude</span>
+          </div>
+          <div class="p-5 font-mono text-[12px] leading-relaxed sm:p-7 sm:text-[13.5px]">
+
+            <div id="lh-panel-0" role="tabpanel" aria-labelledby="lh-tab-0" data-panel="0">
+              <p class="text-[#8f8f96]">open the folder in Claude Code</p>
+              <p class="mt-1 text-neutral-200"><span class="text-lime-300">$</span> cd ~/lead-hunter &amp;&amp; claude</p>
+              <p class="mt-5 text-[#8f8f96]">then ask for the city you want</p>
+              <p class="mt-1 text-neutral-200"><span class="text-lime-300">&gt;</span> find barbers in Munich</p>
+              <p class="mt-5 border-t border-white/10 pt-4 text-[12px] text-neutral-400">
+                It picks the country pack, translates the trade, runs the search, and opens the file.
+                You never type a flag.</p>
+            </div>
+
+            <div id="lh-panel-1" role="tabpanel" aria-labelledby="lh-tab-1" tabindex="0" data-panel="1" class="hidden">
+              <p class="text-[#8f8f96]">open the same folder in Codex</p>
+              <p class="mt-1 text-neutral-200"><span class="text-lime-300">$</span> cd ~/lead-hunter &amp;&amp; codex</p>
+              <p class="mt-5 text-[#8f8f96]">then ask the same way</p>
+              <p class="mt-1 text-neutral-200"><span class="text-lime-300">&gt;</span> find barbers in Munich</p>
+              <p class="mt-5 border-t border-white/10 pt-4 text-[12px] text-neutral-400">
+                The instruction files for both assistants ship in the download, so neither one needs
+                to be told what this folder is.</p>
+            </div>
+
+            <div id="lh-panel-2" role="tabpanel" aria-labelledby="lh-tab-2" tabindex="0" data-panel="2" class="hidden">
+              <p class="text-[#8f8f96]">or drive it yourself</p>
+              <p class="mt-1 text-neutral-200"><span class="text-lime-300">$</span> python leadhunter.py -c de "friseur münchen"</p>
+              <p class="mt-5 text-[#8f8f96]">same result, same file</p>
+              <p class="mt-1 text-neutral-400">barbers-munich.xlsx</p>
+              <p class="mt-5 border-t border-white/10 pt-4 text-[12px] text-neutral-400">
+                Everything the assistants do, you can do by hand. The scoring and the teardowns run
+                the same either way.</p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= 4. HOW IT WORKS ========================= -->
+  <section class="border-t border-white/10 bg-black/20">
+    <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-24">
+      <div class="lh-rise max-w-2xl">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">04 / how it works</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">From nothing to twenty profiles, in an evening</h2>
+      </div>
+
+      <p class="lh-rise mt-4 text-lg text-neutral-400">Four steps. After each one you have something real.</p>
+
+      <ol class="relative mt-11 grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+        <span aria-hidden="true" class="lh-step-line absolute left-8 right-8 top-[34px] hidden h-px lg:block"></span>
+
+        <li class="lh-rise lh-edge relative flex flex-col rounded-2xl border border-white/10 bg-[#0b0b10] p-5">
+          <span class="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-lime-300/30 bg-[#0b0b10] font-mono text-xs font-bold text-lime-300">01</span>
+          <p class="mt-4 text-[15px] leading-relaxed text-neutral-200">Install it once. Python, then the folder, on Mac, Windows or Linux.</p>
+          <div class="mt-5 rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 font-mono text-[11px] text-neutral-400">
+            <span class="text-lime-300">&#9660;</span> ~/lead-hunter
+          </div>
+        </li>
+
+        <li class="lh-rise lh-edge relative flex flex-col rounded-2xl border border-white/10 bg-[#0b0b10] p-5">
+          <span class="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-lime-300/30 bg-[#0b0b10] font-mono text-xs font-bold text-lime-300">02</span>
+          <p class="mt-4 text-[15px] leading-relaxed text-neutral-200">Ask in plain language, in Claude Code or Codex.</p>
+          <div class="mt-5 rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 font-mono text-[11px] text-neutral-300">
+            <span class="text-lime-300">&gt;</span> find barbers in Munich
+          </div>
+        </li>
+
+        <li class="lh-rise lh-edge relative flex flex-col rounded-2xl border border-white/10 bg-[#0b0b10] p-5">
+          <span class="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-lime-300/30 bg-[#0b0b10] font-mono text-xs font-bold text-lime-300">03</span>
+          <p class="mt-4 text-[15px] leading-relaxed text-neutral-200">Get the file. Excel and CSV, scored and sorted.</p>
+          <div class="mt-5 flex items-center gap-2 rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 font-mono text-[11px] text-neutral-400">
+            <span class="text-lime-300">&#9635;</span> barbers-munich.xlsx
+            <span class="ml-auto rounded bg-lime-300/15 px-1.5 py-0.5 font-bold text-lime-300" data-count-to="92">0</span>
+          </div>
+        </li>
+
+        <li class="lh-rise lh-edge relative flex flex-col rounded-2xl border border-white/10 bg-[#0b0b10] p-5">
+          <span class="relative z-10 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-lime-300/30 bg-[#0b0b10] font-mono text-xs font-bold text-lime-300">04</span>
+          <p class="mt-4 text-[15px] leading-relaxed text-neutral-200">Get the teardowns. Twenty profiles with a pitch angle and a price.</p>
+          <div class="mt-5 rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 font-mono text-[11px] text-neutral-400">
+            <span class="text-lime-300">&#9998;</span> profile 01 of 20
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <div class="lh-rise mx-auto max-w-6xl px-5 pb-16 sm:px-8 sm:pb-20">
+    <div class="lh-edge flex flex-col gap-4 rounded-2xl border border-lime-300/20 bg-lime-300/[0.05] p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+      <p class="text-[15px] leading-relaxed text-neutral-300 sm:flex-1">That is the whole workflow. Install it once tonight and the first file is yours in an evening.</p>
+      <!-- checkout -->
+      <a href="https://buy.stripe.com/8x2fZi2LK5ri2g1eKIgA800" class="lh-sheen group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-lime-300 px-6 py-3.5 text-[15px] font-semibold text-neutral-950 transition hover:bg-lime-200 sm:w-auto">
+        Get Lead Hunter, $67
+        <svg aria-hidden="true" class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ========================= 3. WHAT YOU GET ========================= -->
+  <section id="what-you-get" class="border-t border-white/10">
+    <div class="mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-28">
+      <div class="lh-rise max-w-3xl">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">05 / what is in the box</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">Nine things ship in the folder. One price.</h2>
+        <p class="mt-5 text-lg text-neutral-400">
+          The scraper, three skills, and five more tools nobody tells you about. No second tier,
+          nothing to add on.
+        </p>
+      </div>
+
+      <!-- the scraper -->
+      <article class="lh-rise lh-edge mt-12 overflow-hidden rounded-3xl border border-white/10 bg-white/[0.03]">
+        <div class="grid gap-10 p-6 sm:p-10 lg:grid-cols-[1fr_1.15fr] lg:items-center lg:gap-14">
+          <div>
+            <span class="inline-flex rounded-lg border border-white/10 bg-white/[0.05] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-neutral-400">the tool</span>
+            <h3 class="mt-4 text-2xl font-semibold tracking-[-0.025em] sm:text-3xl">The scraper</h3>
+            <p class="mt-3 text-lg text-neutral-200">You ask once, and the file is on your desktop. Excel and CSV.</p>
+            <ul class="mt-7 space-y-4 text-neutral-400">
+              <li class="flex gap-3.5">
+                <svg aria-hidden="true" class="mt-1 h-4 w-4 shrink-0 text-lime-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                Email, company, trade, city, country, website, phone, source, type, status and date</li>
+              <li class="flex gap-3.5">
+                <svg aria-hidden="true" class="mt-1 h-4 w-4 shrink-0 text-lime-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                21 country profiles: 20 countries each tuned to its own web, plus a worldwide mode</li>
+              <li class="flex gap-3.5">
+                <svg aria-hidden="true" class="mt-1 h-4 w-4 shrink-0 text-lime-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                It asks DNS whether each domain can receive mail, and drops the ones that cannot</li>
+            </ul>
+          </div>
+
+          <!-- output mock -->
+          <div class="lh-edge overflow-hidden rounded-2xl border border-white/10 bg-neutral-950/70">
+            <div class="flex flex-wrap items-center gap-2 border-b border-white/10 bg-white/[0.03] px-4 py-3">
+              <svg aria-hidden="true" class="h-3.5 w-3.5 text-lime-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3v5h5M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M9 13h6M9 17h6"/></svg>
+              <span class="font-mono text-[11px] text-neutral-300">barbers-munich.xlsx</span>
+              <span class="ml-auto font-mono text-[10px] text-[#7c7c85]">pack: DE</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse text-[12.5px] sm:min-w-[430px]">
+                <thead>
+                  <tr class="text-left font-mono text-[10px] uppercase tracking-[0.1em] text-[#8f8f96]">
+                    <th class="border-b border-white/10 px-4 py-2.5 font-medium">Business</th>
+                    <th class="hidden border-b border-white/10 px-4 py-2.5 font-medium sm:table-cell">Email</th>
+                    <th class="border-b border-white/10 px-4 py-2.5 font-medium">Status</th>
+                    <th class="border-b border-white/10 px-4 py-2.5 text-right font-medium">Score</th>
+                  </tr>
+                </thead>
+                <tbody class="text-neutral-400">
+                  <tr data-row>
+                    <td class="border-b border-white/5 px-4 py-3 text-neutral-200">Barbier Schwabing</td>
+                    <td class="hidden border-b border-white/5 px-4 py-3 font-mono text-[11.5px] text-lime-200/80 sm:table-cell">kontakt@barbier-schwabing.de</td>
+                    <td class="border-b border-white/5 px-4 py-3">verified (MX)</td>
+                    <td class="border-b border-white/5 px-4 py-3 text-right"><span class="rounded-md bg-lime-300/15 px-2 py-0.5 font-mono text-[11px] font-bold text-lime-300">92</span></td>
+                  </tr>
+                  <tr data-row>
+                    <td class="border-b border-white/5 px-4 py-3 text-neutral-200">Haarwerk Maxvorstadt</td>
+                    <td class="hidden border-b border-white/5 px-4 py-3 font-mono text-[11.5px] text-lime-200/80 sm:table-cell">info@haarwerk-maxvorstadt.de</td>
+                    <td class="border-b border-white/5 px-4 py-3">verified (MX)</td>
+                    <td class="border-b border-white/5 px-4 py-3 text-right"><span class="rounded-md bg-lime-300/12 px-2 py-0.5 font-mono text-[11px] font-bold text-lime-200">78</span></td>
+                  </tr>
+                  <tr data-row>
+                    <td class="border-b border-white/5 px-4 py-3 text-neutral-200">Klipp Sendling</td>
+                    <td class="hidden border-b border-white/5 px-4 py-3 font-mono text-[11.5px] text-[#7c7c85] sm:table-cell">no website</td>
+                    <td class="border-b border-white/5 px-4 py-3">verified (MX)</td>
+                    <td class="border-b border-white/5 px-4 py-3 text-right"><span class="rounded-md bg-white/[0.06] px-2 py-0.5 font-mono text-[11px] font-bold text-neutral-400">61</span></td>
+                  </tr>
+                  <tr data-row>
+                    <td class="px-4 py-3 text-neutral-200">Herrensalon Giesing</td>
+                    <td class="hidden px-4 py-3 font-mono text-[11.5px] text-lime-200/80 sm:table-cell">post@herrensalon-giesing.de</td>
+                    <td class="px-4 py-3">verified (MX)</td>
+                    <td class="px-4 py-3 text-right"><span class="rounded-md bg-lime-300/12 px-2 py-0.5 font-mono text-[11px] font-bold text-lime-200">74</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="border-t border-white/10 bg-black/30 px-4 py-3 text-[11px] text-[#8f8f96]">
+              Example output. Businesses and scores shown are illustrative.
+            </p>
+          </div>
+        </div>
+      </article>
+
+      <!-- included divider -->
+      <div class="lh-rise mt-12 flex items-center gap-4 sm:mt-14 sm:gap-5">
+        <span class="h-px flex-1 bg-gradient-to-r from-transparent to-white/20"></span>
+        <span class="shrink-0 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-[10.5px] font-semibold uppercase tracking-[0.16em] text-[#8f8f96] sm:px-4 sm:text-[11px]">Also in the folder</span>
+        <span class="h-px flex-1 bg-gradient-to-l from-transparent to-white/20"></span>
+      </div>
+
+      <ul class="lh-rise mt-6 flex flex-wrap justify-center gap-2 sm:mt-7">
+        <li class="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-[13.5px] text-neutral-300 sm:px-4 sm:text-sm">A master file per country</li>
+        <li class="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-[13.5px] text-neutral-300 sm:px-4 sm:text-sm">Batch mode</li>
+        <li class="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-[13.5px] text-neutral-300 sm:px-4 sm:text-sm">A scrub tool for old lists</li>
+        <li class="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-[13.5px] text-neutral-300 sm:px-4 sm:text-sm">A re-verify tool</li>
+        <li class="rounded-xl border border-white/10 bg-white/[0.04] px-3.5 py-2 text-[13.5px] text-neutral-300 sm:px-4 sm:text-sm">A guide for people who do not code</li>
+      </ul>
+
+      <div class="lh-rise lh-edge mx-auto mt-8 flex max-w-2xl items-start gap-4 rounded-2xl border border-lime-300/25 bg-lime-300/[0.05] p-5 sm:mt-10 sm:items-center sm:p-6">
+        <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-lime-300/30 bg-lime-300/10">
+          <svg aria-hidden="true" class="h-4 w-4 text-lime-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v6c0 4.4 3.1 8 7.5 9 4.4-1 7.5-4.6 7.5-9V6z"/><path d="m9 12 2 2 4-4.5"/></svg>
+        </span>
+        <p class="text-[14.5px] leading-relaxed text-neutral-300 sm:text-[15px]">
+          <span class="font-semibold text-neutral-100">And one rule under all of it.</span>
+          The Scorer and the Teardown never guess. What they cannot check on the site is marked
+          not verified, never invented.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <div class="lh-rise mx-auto max-w-6xl px-5 pb-14 sm:px-8 sm:pb-20">
+    <div class="lh-edge flex flex-col gap-4 rounded-2xl border border-lime-300/20 bg-lime-300/[0.05] p-5 sm:flex-row sm:items-center sm:gap-6 sm:p-6">
+      <p class="text-[15px] leading-relaxed text-neutral-300 sm:flex-1">That is the whole box. Yours to run as often as you like, on as many cities as you like.</p>
+      <!-- checkout -->
+      <a href="https://buy.stripe.com/8x2fZi2LK5ri2g1eKIgA800" class="lh-sheen group inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-lime-300 px-6 py-3.5 text-[15px] font-semibold text-neutral-950 transition hover:bg-lime-200 sm:w-auto">
+        Get Lead Hunter, $67
+        <svg aria-hidden="true" class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ========================= 5. FOR / NOT FOR ========================= -->
+  <section class="border-t border-white/10">
+    <div class="mx-auto max-w-5xl px-5 py-14 sm:px-8 sm:py-24">
+      <div class="lh-rise max-w-2xl">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">06 / who it is for</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">Two lists. Read the second one too.</h2>
+      </div>
+
+      <div class="lh-rise lh-edge mt-10 grid overflow-hidden rounded-3xl border border-white/10 md:grid-cols-2">
+        <div class="bg-gradient-to-b from-lime-300/[0.08] to-transparent p-7 sm:p-9">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-lime-300 text-neutral-950">
+              <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+            </span>
+            <h3 class="text-lg font-semibold tracking-[-0.02em]">Buy it if</h3>
+          </div>
+          <ul class="mt-6 space-y-5">
+            <li class="text-[15px] leading-relaxed text-neutral-200">
+              You sell web, design or marketing work to local businesses, and finding the next
+              twenty is the part you put off.</li>
+            <li class="text-[15px] leading-relaxed text-neutral-200">
+              You do B2B outreach and would rather own a list than rent one everybody else
+              is emailing.</li>
+            <li class="text-[15px] leading-relaxed text-neutral-200">
+              You have Claude Code or Codex open most days and would rather ask than learn
+              another dashboard.</li>
+          </ul>
+        </div>
+
+        <div class="border-t border-white/10 bg-white/[0.015] p-7 sm:p-9 md:border-l md:border-t-0">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-xl border border-white/15 text-[#8f8f96]">
+              <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </span>
+            <h3 class="text-lg font-semibold tracking-[-0.02em] text-neutral-400">Skip it if</h3>
+          </div>
+          <ul class="mt-6 space-y-5">
+            <li class="text-[15px] leading-relaxed text-[#8f8f96]">
+              You want a done-for-you database that someone else keeps current.</li>
+            <li class="text-[15px] leading-relaxed text-[#8f8f96]">
+              You want the tool to send the emails. It does not, and it will not.</li>
+            <li class="text-[15px] leading-relaxed text-[#8f8f96]">
+              You are expecting guaranteed results. Nobody can give you those.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= 6. WHY THIS EXISTS ========================= -->
+  <section class="border-t border-white/10 bg-black/20">
+    <div class="mx-auto max-w-4xl px-5 py-14 sm:px-8 sm:py-24">
+      <div class="lh-rise">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">07 / why this exists</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-5xl">I bought the other ones first.</h2>
+      </div>
+
+      <div class="lh-rise mt-9 border-l-2 border-lime-300/60 pl-6 sm:pl-9">
+        <p class="text-lg leading-relaxed text-neutral-300 sm:text-xl">
+          I kept paying for scrapers. Every one of them handed me the same file: directories in it,
+          portals in it, dead addresses in it, and no way to tell which row was worth an email.
+          I cleaned those by hand for longer than I want to admit.
+        </p>
+        <p class="mt-5 text-lg leading-relaxed text-neutral-300 sm:text-xl">
+          Not one of them ever gave me the thing I actually asked for. So I wrote it. It throws out
+          the junk before I see it, scores what is left, and tells me what to say to the first twenty.
+        </p>
+        <p class="mt-5 text-lg leading-relaxed text-neutral-100 sm:text-xl">
+          That is the whole product. If it does not do that for you, take the refund.
+        </p>
+        <p class="mt-8 font-mono text-sm text-[#8f8f96]">Leon Ilišin &middot; built it for my own outreach</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= 7. PRICE ========================= -->
+  <section id="price" class="relative border-t border-white/10">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-[radial-gradient(50rem_20rem_at_50%_100%,rgba(182,255,61,.14),transparent_70%)]"></div>
+    <div class="relative mx-auto max-w-6xl px-5 py-14 sm:px-8 sm:py-28">
+      <h2 class="lh-rise mb-7 text-center text-[1.85rem] font-semibold tracking-[-0.03em] sm:mb-10 sm:text-4xl">One folder. One payment.</h2>
+      <div class="lh-rise lh-edge lh-edge-acc overflow-hidden rounded-[1.75rem] border border-lime-300/30 bg-gradient-to-b from-lime-300/[0.08] to-transparent shadow-[0_50px_120px_-60px_rgba(182,255,61,.6)] sm:rounded-[2rem]">
+        <div class="p-5 sm:p-9 lg:p-12">
+
+          <!-- Price and button come first. On a phone this is the whole decision. -->
+          <div class="lg:flex lg:items-center lg:gap-14">
+            <div class="lg:flex-1">
+              <p class="font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#8f8f96]">the price</p>
+              <div class="mt-3 flex items-start gap-1">
+                <span class="mt-1.5 text-2xl font-semibold text-[#8f8f96] sm:mt-3 sm:text-3xl">$</span>
+                <span class="bg-gradient-to-br from-lime-200 to-lime-400 bg-clip-text text-[4.75rem] font-semibold leading-[0.82] tracking-[-0.05em] text-transparent sm:text-[6rem]">67</span>
+                <span class="ml-3 mt-auto pb-1.5 font-mono text-[11px] uppercase tracking-[0.16em] text-[#8f8f96]">paid once</span>
+              </div>
+              <p class="mt-4 text-[16px] leading-snug text-neutral-300 sm:text-[17px]">
+                Nine tools in one folder. There is no tier above this one.
+              </p>
+            </div>
+
+            <div class="mt-6 lg:mt-0 lg:w-[320px] lg:shrink-0">
+              <!-- checkout -->
+              <a href="https://buy.stripe.com/8x2fZi2LK5ri2g1eKIgA800" class="lh-sheen group inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-lime-300 px-6 py-4 text-[17px] font-semibold text-neutral-950 shadow-[0_20px_50px_-20px_rgba(182,255,61,.9)] transition hover:-translate-y-0.5 hover:bg-lime-200 sm:text-lg">
+                Get Lead Hunter
+                <svg aria-hidden="true" class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+              </a>
+              <p class="mt-3 text-center text-[12.5px] text-[#8f8f96]">The download link arrives by email. 14 days to change your mind.</p>
+            </div>
+          </div>
+
+          <!-- What is inside, as a compact ledger instead of three panels. -->
+          <p class="mt-9 font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#8f8f96] sm:mt-12">inside the folder</p>
+          <ul class="mt-3 border-t border-white/[0.07] lg:[column-count:2] lg:[column-gap:3.5rem]">
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">The scraper</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">21 profiles</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">Control Skill</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">Claude Code, Codex</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">Lead Scorer</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">0 to 100, sorted</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">Prospect Teardown</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">20 profiles</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">A master file per country</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">de-duplicated</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">Batch mode</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">trade by city, resumable</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">A scrub tool</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">for old lists</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">A re-verify tool</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">checks without sending</span>
+            </li>
+            <li class="flex items-baseline justify-between gap-4 border-b border-white/[0.07] py-3 lg:[break-inside:avoid]">
+              <span class="text-[15px] text-neutral-100 sm:text-base">The non-technical guide</span>
+              <span class="shrink-0 text-right text-[12.5px] text-[#8f8f96] sm:text-[13.5px]">Windows included</span>
+            </li>
+          </ul>
+
+          <ul class="mt-5 flex flex-wrap gap-2">
+            <li class="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[12px] text-neutral-300 sm:px-3 sm:text-[12.5px]">Updates, 12 months</li>
+            <li class="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[12px] text-neutral-300 sm:px-3 sm:text-[12.5px]">Mac, Windows, Linux</li>
+            <li class="rounded-lg border border-lime-300/25 bg-lime-300/[0.07] px-2.5 py-1.5 text-[12px] text-lime-200/90 sm:px-3 sm:text-[12.5px]">14-day refund</li>
+            <li class="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[12px] text-neutral-300 sm:px-3 sm:text-[12.5px]">No subscription</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================= 6. WHAT THIS DOES NOT DO ========================= -->
+  <section class="border-t border-white/10 bg-black/20">
+    <div class="mx-auto max-w-4xl px-5 py-14 sm:px-8 sm:py-24">
+      <div class="lh-rise">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">08 / the limits</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">What this does not do</h2>
+      </div>
+      <p class="lh-rise mt-5 text-lg text-neutral-400">Five things it will not do. Better you read them now than after you pay.</p>
+
+      <dl class="lh-rise mt-10 grid gap-px overflow-hidden rounded-3xl border border-white/10 bg-white/10 sm:grid-cols-2">
+        <div class="bg-[#0a0a0e] p-7">
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-neutral-400">
+            <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="m3.5 7 8.5 6 8.5-6"/><path d="m4 20 16-16"/></svg>
+          </span>
+          <dt class="mt-4 text-lg font-medium tracking-[-0.01em] text-neutral-100">It does not send emails.</dt>
+          <dd class="mt-2 text-neutral-400">It builds the list and profiles it. Sending is your job, in your own tool.</dd>
+        </div>
+        <div class="bg-[#0a0a0e] p-7">
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-neutral-400">
+            <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.3-4.3"/></svg>
+          </span>
+          <dt class="mt-4 text-lg font-medium tracking-[-0.01em] text-neutral-100">It depends on public search engines.</dt>
+          <dd class="mt-2 text-neutral-400">When they change, it occasionally needs adjusting.</dd>
+        </div>
+        <div class="bg-[#0a0a0e] p-7">
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-neutral-400">
+            <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v5M12 16.5v.01"/><circle cx="12" cy="12" r="9"/></svg>
+          </span>
+          <dt class="mt-4 text-lg font-medium tracking-[-0.01em] text-neutral-100">Results are not guaranteed to be 100% accurate.</dt>
+          <dd class="mt-2 text-neutral-400">Check anything you are about to put in front of a client.</dd>
+        </div>
+        <div class="bg-[#0a0a0e] p-7">
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-neutral-400">
+            <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.5l3.5 2"/></svg>
+          </span>
+          <dt class="mt-4 text-lg font-medium tracking-[-0.01em] text-neutral-100">Twenty is the cap, not a promise.</dt>
+            <dd class="mt-2 text-neutral-400">A big city gives you twenty profiles. A narrow trade in a small town gives you what it finds, and says how many.</dd>
+          </div>
+          <div class="bg-[#0a0a0e] p-7">
+            <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/10 bg-white/[0.03] text-neutral-400">
+              <svg aria-hidden="true" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.01"/></svg>
+            </span>
+            <dt class="mt-4 text-lg font-medium tracking-[-0.01em] text-neutral-100">Updates run for 12 months, not lifetime.</dt>
+          <dd class="mt-2 text-neutral-400">After that the version you have keeps working. You just stop getting new ones.</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- ========================= 8. FAQ ========================= -->
+  <section class="border-t border-white/10">
+    <div class="mx-auto max-w-3xl px-5 py-14 sm:px-8 sm:py-24">
+      <div class="lh-rise">
+        <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#8f8f96]">09 / questions</p>
+        <h2 class="mt-4 text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">Questions</h2>
+      </div>
+
+      <div class="lh-rise mt-10 divide-y divide-white/10 border-y border-white/10">
+        <details class="group py-1">
+          <summary class="flex cursor-pointer list-none items-center gap-5 py-5 text-lg font-medium text-neutral-100 transition hover:text-lime-300 [&amp;::-webkit-details-marker]:hidden">
+            Do I need an API key or a subscription?
+            <svg aria-hidden="true" class="ml-auto h-5 w-5 shrink-0 text-[#8f8f96] transition group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="pb-6 pr-10 text-neutral-400">No, and no account either. You pay once and run it on your own machine. There is no monthly cost, to me or to anyone else.</p>
+        </details>
+        <details class="group py-1">
+          <summary class="flex cursor-pointer list-none items-center gap-5 py-5 text-lg font-medium text-neutral-100 transition hover:text-lime-300 [&amp;::-webkit-details-marker]:hidden">
+            Do I need to know how to code?
+            <svg aria-hidden="true" class="ml-auto h-5 w-5 shrink-0 text-[#8f8f96] transition group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="pb-6 pr-10 text-neutral-400">No. You open the folder in Claude Code or Codex and ask in plain language. The Control Skill picks the country pack, builds the command and runs it. The terminal is there if you prefer it.</p>
+        </details>
+        <details class="group py-1">
+          <summary class="flex cursor-pointer list-none items-center gap-5 py-5 text-lg font-medium text-neutral-100 transition hover:text-lime-300 [&amp;::-webkit-details-marker]:hidden">
+            Which countries are supported, and what if mine is not?
+            <svg aria-hidden="true" class="ml-auto h-5 w-5 shrink-0 text-[#8f8f96] transition group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="pb-6 pr-10 text-neutral-400">Twenty countries have their own profile: Croatia, Slovenia, Germany, Austria, Czechia, Hungary, Poland, Italy, France, Spain, Netherlands, Belgium, United Kingdom, Ireland, United States, Sweden, Norway, Denmark, Finland and Iceland. Everywhere else runs in worldwide mode. Coverage quality varies: the profiles I use myself are the sharpest, and the rest leave more cleaning to you.</p>
+        </details>
+        <details class="group py-1">
+          <summary class="flex cursor-pointer list-none items-center gap-5 py-5 text-lg font-medium text-neutral-100 transition hover:text-lime-300 [&amp;::-webkit-details-marker]:hidden">
+            Does it work on Windows?
+            <svg aria-hidden="true" class="ml-auto h-5 w-5 shrink-0 text-[#8f8f96] transition group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="pb-6 pr-10 text-neutral-400">Yes. Mac, Windows and Linux, and it runs the same in Claude Code and Codex on all three. The guide walks the setup step by step.</p>
+        </details>
+        <details class="group py-1">
+          <summary class="flex cursor-pointer list-none items-center gap-5 py-5 text-lg font-medium text-neutral-100 transition hover:text-lime-300 [&amp;::-webkit-details-marker]:hidden">
+            What happens when search engines change?
+            <svg aria-hidden="true" class="ml-auto h-5 w-5 shrink-0 text-[#8f8f96] transition group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <p class="pb-6 pr-10 text-neutral-400">The tool occasionally needs adjusting. That is what the 12 months of updates are for.</p>
+        </details>
+        <details class="group py-1">
+          <summary class="flex cursor-pointer list-none items-center gap-5 py-5 text-lg font-medium text-neutral-100 transition hover:text-lime-300 [&amp;::-webkit-details-marker]:hidden">
+            How do refunds work?
+            <svg aria-hidden="true" class="ml-auto h-5 w-5 shrink-0 text-[#8f8f96] transition group-open:rotate-45" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          </summary>
+          <!-- support -->
+          <p class="pb-6 pr-10 text-neutral-400">Fourteen days from purchase. Write to <a href="mailto:ilisinleon@gmail.com" class="text-lime-300 underline underline-offset-4 decoration-lime-300/40 hover:decoration-lime-300">ilisinleon@gmail.com</a> and you get your money back.</p>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================= 9. FINAL CTA ========================= -->
+  <section class="relative border-t border-white/10">
+    <div aria-hidden="true" class="pointer-events-none absolute inset-0 bg-[radial-gradient(46rem_18rem_at_50%_110%,rgba(182,255,61,.18),transparent_70%)]"></div>
+    <div class="relative mx-auto max-w-3xl px-5 py-16 text-center sm:px-8 sm:py-32">
+      <p class="lh-rise mx-auto max-w-2xl text-left text-2xl font-semibold leading-[1.25] tracking-[-0.03em] sm:text-center sm:text-4xl">
+        One sentence, a few hundred local businesses, twenty of them profiled and ready to pitch.
+        <span class="text-lime-300">Sixty-seven dollars, paid once.</span>
+        Fourteen days to ask for it back if it is not for you.
+      </p>
+      <!-- checkout -->
+      <a href="https://buy.stripe.com/8x2fZi2LK5ri2g1eKIgA800"
+         class="lh-rise group mt-10 inline-flex items-center justify-center gap-2 rounded-2xl bg-lime-300 px-10 py-4 text-lg font-semibold text-neutral-950 shadow-[0_20px_50px_-20px_rgba(182,255,61,.9)] transition hover:-translate-y-0.5 hover:bg-lime-200">
+        Get Lead Hunter, $67
+        <svg aria-hidden="true" class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </section>
+
+
+<!-- ========================= BUILD MARKER =========================
+     Delete this block before the page goes live. It exists so you can tell at a
+     glance whether the browser handed you a cached copy. -->
+</div><!-- /relative -->
+
+<!-- ========================= STICKY OFFER BAR ========================= -->
+<div class="lh-bar" id="lh-bar" aria-hidden="false">
+  <div class="mx-auto flex max-w-6xl items-center gap-3 px-4 py-3 sm:gap-4 sm:px-8 sm:py-3.5">
+    <div class="min-w-0 flex-1">
+      <p class="hidden truncate text-[15px] font-semibold tracking-[-0.02em] text-neutral-100 sm:block">Lead Hunter</p>
+      <p class="truncate text-[17px] font-semibold tracking-[-0.02em] text-neutral-100 sm:text-[12px] sm:font-normal sm:text-[#8f8f96]">
+        <span class="sm:text-neutral-300">$67 once</span>
+        <span class="hidden sm:inline"> &middot; nine tools in one folder &middot; 14 days to change your mind</span>
+      </p>
+      <p class="truncate text-[11px] text-[#8f8f96] sm:hidden">14-day refund</p>
+    </div>
+    <!-- checkout -->
+    <a href="https://buy.stripe.com/8x2fZi2LK5ri2g1eKIgA800" class="lh-sheen group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-lime-300 px-4 py-3 text-[14px] font-semibold text-neutral-950 transition hover:bg-lime-200 sm:px-7 sm:text-[15px]">
+      Get Lead Hunter
+      <svg aria-hidden="true" class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+    </a>
+  </div>
+</div>
+
+<script>
+/* Scroll reveals. If this never runs, every .lh-rise stays visible, because the
+   hidden state is only applied to elements this script has seen. */
+(function () {
+  var root = document.getElementById('lh');
+  if (!root) return;
+  var items = Array.prototype.slice.call(root.querySelectorAll('.lh-rise'));
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced || !('IntersectionObserver' in window)) {
+    items.forEach(function (el) { el.classList.add('in'); });
+    return;
+  }
+  var io = new IntersectionObserver(function (entries, obs) {
+    entries.forEach(function (en) {
+      if (!en.isIntersecting) return;
+      var sibs = Array.prototype.filter.call(en.target.parentElement.children, function (c) {
+        return c.classList.contains('lh-rise');
+      });
+      en.target.style.transitionDelay = Math.min(Math.max(sibs.indexOf(en.target), 0), 6) * 65 + 'ms';
+      en.target.classList.add('in');
+      obs.unobserve(en.target);
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
+
+  items.forEach(function (el) {
+    if (el.getBoundingClientRect().top < window.innerHeight * 0.95) {
+      el.classList.add('in');
+    } else {
+      io.observe(el);
+    }
+  });
+  // safety net: nothing on this page may stay invisible because an observer stayed quiet
+  setTimeout(function () {
+    if (!root.querySelector('.lh-rise.in')) items.forEach(function (el) { el.classList.add('in'); });
+  }, 2400);
+})();
+
+/* The offer bar. It earns its place only after the reader has passed the hero, and it
+   gets out of the way at the price block so it never covers the real button. */
+(function () {
+  var bar = document.getElementById('lh-bar');
+  var hero = document.querySelector('#lh section');
+  var price = document.getElementById('price');
+  if (!bar || !hero || !price) return;
+  function update() {
+    var pastHero = window.scrollY > Math.min(hero.offsetHeight * 0.6, 760);
+    var r = price.getBoundingClientRect();
+    var atPrice = r.top < window.innerHeight && r.bottom > 0;
+    var atEnd = (window.innerHeight + window.scrollY) > (document.body.scrollHeight - 260);
+    bar.classList.toggle('on', pastHero && !atPrice && !atEnd);
+  }
+  update();
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update);
+})();
+
+/* Section motion. One observer for the whole page: sequences that play row by row,
+   bars that fill, rows that arrive, numbers that count. Everything starts only when
+   it reaches the screen, and reduced motion skips straight to the finished state. */
+(function () {
+  var root = document.getElementById('lh');
+  if (!root) return;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var seqs    = Array.prototype.slice.call(root.querySelectorAll('[data-seq]'));
+  var bars    = Array.prototype.slice.call(root.querySelectorAll('[data-bar]'));
+  var rowSets = [];
+  Array.prototype.forEach.call(root.querySelectorAll('tbody'), function (tb) {
+    var rows = Array.prototype.slice.call(tb.querySelectorAll('[data-row]'));
+    if (rows.length) rowSets.push(rows);
+  });
+  var counters = Array.prototype.slice.call(root.querySelectorAll('[data-count-to]'));
+
+  function fillBar(el) { el.style.width = el.getAttribute('data-w') + '%'; }
+  function playSeq(el) {
+    Array.prototype.slice.call(el.querySelectorAll('[data-seq-item]')).forEach(function (item, i) {
+      setTimeout(function () { item.classList.add('on'); }, i * 260);
+    });
+  }
+  function playRows(rows) {
+    rows.forEach(function (r, i) { setTimeout(function () { r.classList.add('on'); }, i * 130); });
+  }
+  function count(el) {
+    var target = +el.getAttribute('data-count-to'), t0 = performance.now(), dur = 700;
+    (function tick(now) {
+      var p = Math.min((now - t0) / dur, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  }
+
+  if (reduced || !('IntersectionObserver' in window)) {
+    seqs.forEach(function (el) {
+      Array.prototype.forEach.call(el.querySelectorAll('[data-seq-item]'), function (i) { i.classList.add('on'); });
+    });
+    bars.forEach(fillBar);
+    rowSets.forEach(function (rows) { rows.forEach(function (r) { r.classList.add('on'); }); });
+    counters.forEach(function (el) { el.textContent = el.getAttribute('data-count-to'); });
+    return;
+  }
+
+  function watch(el, fn) {
+    var io = new IntersectionObserver(function (entries, obs) {
+      if (!entries[0].isIntersecting) return;
+      obs.disconnect(); fn();
+    }, { threshold: 0.35 });
+    io.observe(el);
+  }
+  seqs.forEach(function (el) { watch(el, function () { playSeq(el); }); });
+  bars.forEach(function (el) { watch(el.parentElement, function () { fillBar(el); }); });
+  rowSets.forEach(function (rows) { watch(rows[0].parentElement, function () { playRows(rows); }); });
+  counters.forEach(function (el) { watch(el, function () { count(el); }); });
+
+  // safety net: nothing may stay half drawn because an observer stayed quiet
+  setTimeout(function () {
+    seqs.forEach(function (el) {
+      var items = el.querySelectorAll('[data-seq-item]');
+      if (items.length && !items[0].classList.contains('on')) playSeq(el);
+    });
+    bars.forEach(function (el) { if (!el.style.width) fillBar(el); });
+    rowSets.forEach(function (rows) { if (!rows[0].classList.contains('on')) playRows(rows); });
+    counters.forEach(function (el) { if (el.textContent === '0') el.textContent = el.getAttribute('data-count-to'); });
+  }, 3200);
+})();
+
+/* The three environment tabs. They cycle on their own so the page shows all three
+   without asking anyone to click, and a click takes over and stops the cycling. */
+(function () {
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('#lh .lh-tab'));
+  if (!tabs.length) return;
+  var panels = Array.prototype.slice.call(document.querySelectorAll('#lh [data-panel]'));
+  var title = document.querySelector('#lh [data-tab-title]');
+  var names = ['claude', 'codex', 'zsh'];
+  var timer = null, i = 0;
+
+  function show(n, focus) {
+    i = n;
+    tabs.forEach(function (t, k) {
+      t.setAttribute('aria-selected', String(k === n));
+      t.setAttribute('tabindex', k === n ? '0' : '-1');
+    });
+    if (focus) tabs[n].focus();
+    panels.forEach(function (pnl, k) { pnl.classList.toggle('hidden', k !== n); });
+    if (title) title.textContent = names[n] || names[0];
+  }
+  function cycle() { timer = setInterval(function () { show((i + 1) % tabs.length); }, 4600); }
+  function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+  tabs.forEach(function (t, n) {
+    t.addEventListener('click', function () { stop(); show(n); });
+    // arrow keys are how people actually move through a tab strip
+    t.addEventListener('keydown', function (e) {
+      var d = e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1
+            : e.key === 'ArrowLeft'  || e.key === 'ArrowUp'   ? -1 : 0;
+      if (!d) return;
+      e.preventDefault(); stop();
+      show((n + d + tabs.length) % tabs.length, true);
+    });
+  });
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { show(0); return; }
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (e) {
+      if (e[0].isIntersecting) { if (!timer) cycle(); } else { stop(); }
+    }, { threshold: 0.3 }).observe(tabs[0].parentElement);
+  } else { cycle(); }
+})();
+
+/* The demo player. Runs only while it is on screen and the tab is awake, so it
+   costs nothing when nobody is looking. Under reduced motion it paints the
+   finished state once and stops. */
+(function () {
+  var demo = document.getElementById('lh-demo');
+  if (!demo) return;
+  var typeEl = document.getElementById('lh-type');
+  var caret  = document.getElementById('lh-caret');
+  var stage  = demo.querySelector('.lh-stage');
+  var steps  = Array.prototype.slice.call(demo.querySelectorAll('.lh-d'));
+  var scores = Array.prototype.slice.call(demo.querySelectorAll('[data-score]'));
+  var ASK = 'find barbers in Munich';
+  var timers = [], visible = false, playing = false;
+
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; }
+  function at(ms, fn) { timers.push(setTimeout(fn, ms)); }
+
+  function paintFinal() {
+    typeEl.textContent = ASK;
+    caret.classList.add('idle');
+    steps.forEach(function (el) { el.classList.add('on'); });
+    scores.forEach(function (el) { el.textContent = el.getAttribute('data-score'); });
+  }
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { paintFinal(); return; }
+
+  function countUp(el) {
+    var target = +el.getAttribute('data-score'), t0 = performance.now(), dur = 560;
+    (function tick(now) {
+      var p = Math.min((now - t0) / dur, 1);
+      el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  }
+
+  function reset() {
+    clearTimers();
+    stage.style.opacity = '1';
+    typeEl.textContent = '';
+    caret.classList.remove('idle');
+    steps.forEach(function (el) { el.classList.remove('on'); });
+    scores.forEach(function (el) { el.textContent = '0'; });
+  }
+
+  function play() {
+    if (!visible || document.hidden) { playing = false; return; }
+    playing = true;
+    reset();
+
+    var i = 0;
+    function type() {
+      typeEl.textContent = ASK.slice(0, ++i);
+      if (i < ASK.length) { timers.push(setTimeout(type, 44 + Math.random() * 46)); }
+      else { caret.classList.add('idle'); }
+    }
+    at(260, type);
+
+    [1650, 2100, 2650, 3200, 3700, 4200].forEach(function (ms, n) {
+      at(ms, function () { steps[n].classList.add('on'); });
+    });
+    [4450, 4670, 4890, 5110].forEach(function (ms, n) {
+      at(ms, function () { steps[6 + n].classList.add('on'); });
+    });
+    at(5350, function () { scores.forEach(countUp); });
+    at(5950, function () { steps[10].classList.add('on'); });
+    at(9400, function () { stage.style.opacity = '0'; });
+    at(10000, play);
+  }
+
+  function stop() { playing = false; clearTimers(); }
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver(function (entries) {
+      visible = entries[0].isIntersecting;
+      if (visible && !playing) play();
+      if (!visible) stop();
+    }, { threshold: 0.25 }).observe(demo);
+  } else {
+    visible = true; play();
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) stop();
+    else if (visible && !playing) play();
+  });
+
+  // Safety net. If nothing has started after three seconds, because the observer
+  // stayed quiet or the tab was opened in the background, paint the finished state.
+  // An empty terminal is the one thing this frame must never show.
+  setTimeout(function () {
+    if (!playing && !steps[0].classList.contains('on')) {
+      if (document.hidden) { paintFinal(); }
+      else { visible = true; play(); }
+    }
+  }, 3000);
+})();
+</script>
+</div><!-- /#lh -->

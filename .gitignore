@@ -1,0 +1,6 @@
+stripe.key
+.env
+archive/
+lead-hunter-67-preview.html
+*.bak
+.DS_Store
