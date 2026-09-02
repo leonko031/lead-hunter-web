@@ -23,6 +23,23 @@
       This page requires JavaScript to display.
     </div>
   </noscript>
+  <!-- Meta Pixel Code -->
+  <script>
+  !function(f,b,e,v,n,t,s)
+  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+  n.queue=[];t=b.createElement(e);t.async=!0;
+  t.src=v;s=b.getElementsByTagName(e)[0];
+  s.parentNode.insertBefore(t,s)}(window, document,'script',
+  'https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init', '2271700780329849');
+  fbq('track', 'PageView');
+  </script>
+  <noscript><img height="1" width="1" style="display:none"
+  src="https://www.facebook.com/tr?id=2271700780329849&ev=PageView&noscript=1"
+  /></noscript>
+  <!-- End Meta Pixel Code -->
 </head>
 <body>
   <div id="__bundler_thumbnail">
@@ -420,6 +437,14 @@ document.addEventListener('DOMContentLoaded', async function() {
   apply();
   [0, 60, 400, 1500, 4000].forEach(function (t) { setTimeout(apply, t); });
 })();
+</script>
+<script>
+/* Meta Pixel: fire InitiateCheckout when any Stripe checkout link is clicked (event delegation, works after the page renders) */
+document.addEventListener('click', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('a[href*="buy.stripe.com"]') : null;
+  if (!a || typeof window.fbq !== 'function') return;
+  window.fbq('track', 'InitiateCheckout', { content_name: 'Lead Hunter', value: 67, currency: 'USD' });
+}, true);
 </script>
 </body>
 </html>
