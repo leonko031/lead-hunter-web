@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Thank you - Lead Hunter</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '2271700780329849');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=2271700780329849&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+<script>
+/* Purchase. event_id is the Stripe session id, the same id the delivery
+   service sends from the server, so Meta counts one sale and not two. */
+(function () {
+  var sid = new URLSearchParams(location.search).get('session_id') || '';
+  var opts = sid ? { eventID: sid } : {};
+  fbq('track', 'Purchase', { value: 67.00, currency: 'USD', content_name: 'Lead Hunter' }, opts);
+})();
+</script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:#08080a;color:#f4f4f6;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif;
+       min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+       background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+       background-size:64px 64px}
+  .wrap{max-width:560px;width:100%}
+  .mark{display:inline-flex;align-items:center;gap:10px;font-weight:700;letter-spacing:-.02em;font-size:16px;margin-bottom:40px}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#b6ff3d;margin-bottom:16px}
+  h1{font-size:clamp(30px,5vw,44px);font-weight:600;letter-spacing:-.035em;line-height:1.08;margin-bottom:20px;text-wrap:pretty}
+  p{font-size:16px;line-height:1.7;color:#9a9aa3;margin-bottom:16px;text-wrap:pretty}
+  .btn{display:inline-flex;align-items:center;gap:8px;background:#b6ff3d;color:#0a0a0c;text-decoration:none;
+       font-weight:600;font-size:15px;padding:15px 26px;border-radius:12px;margin:16px 0 28px;transition:background .2s}
+  .btn:hover{background:#d3ff85}
+  .steps{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.03);border-radius:16px;padding:22px 24px}
+  .steps p{margin:0 0 12px;font-size:15px;color:#c9c9d1}
+  .steps p:last-child{margin:0}
+  .steps b{color:#f4f4f6;font-weight:600}
+  .foot{margin-top:28px;font-size:13.5px;color:#71717b}
+  .foot a{color:#b6ff3d;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <span class="mark">
+    <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" style="flex-shrink:0">
+      <rect width="24" height="24" rx="7" fill="#b6ff3d"></rect>
+      <circle cx="12" cy="12" r="4.6" fill="none" stroke="#0a0a0c" stroke-width="1.8"></circle>
+      <circle cx="12" cy="12" r="1.4" fill="#0a0a0c"></circle>
+      <path d="M12 3.4v3.2M12 17.4v3.2M3.4 12h3.2M17.4 12h3.2" stroke="#0a0a0c" stroke-width="1.8" stroke-linecap="round"></path>
+    </svg>
+    Lead Hunter
+  </span>
+  <p class="kicker">Payment received</p>
+  <h1>It is yours. Download the folder and run your first city.</h1>
+  <p>The same link is in your inbox, so you can come back to it later. If it is not there in a few minutes, look in spam, then write to us.</p>
+  <a class="btn" href="https://leadhunter-delivery.fly.dev/d/RGtS4Uezidpq-DHqXc5iRSCvIZ6cvYFv">Download Lead Hunter</a>
+  <div class="steps">
+    <p><b>1.</b> Unzip the folder anywhere on your computer.</p>
+    <p><b>2.</b> Open it in Claude Code or Codex.</p>
+    <p><b>3.</b> Type the trade and the city you want, in plain words. The guide inside has the exact first line if you would rather copy it.</p>
+  </div>
+  <p class="foot">Questions or trouble running it: <a href="mailto:getleadhunter@gmail.com">getleadhunter@gmail.com</a>. Fourteen days to change your mind.</p>
+</div>
+</body>
+</html>
