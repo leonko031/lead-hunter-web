@@ -2,13 +2,18 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Lead Hunter - $67 - an Excel list of local businesses</title>
+  <title>Lead Hunter - local businesses that need what you sell</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Every scraper hands you a raw dump. This one asks DNS before it writes the row. Nine tools in one folder, $67 paid once.">
-  <meta property="og:title" content="Lead Hunter - $67">
-  <meta property="og:description" content="An Excel list of local businesses, checked before you open it.">
+  <meta name="description" content="Type a trade and a city. Get local businesses with a broken website, a checked email, what to sell them and what to charge. Runs in Claude Code or Codex.">
+  <meta property="og:title" content="Local businesses with a broken website, and what to charge">
+  <meta property="og:description" content="Type a trade and a city. Every row carries a checked email, the fault on their site, and the job that fixes it.">
   <meta property="og:type" content="website">
+  <meta property="og:url" content="https://getleadhunter.io/">
+  <meta property="og:image" content="https://getleadhunter.io/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://getleadhunter.io/og.png">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #060608; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
@@ -417,13 +422,16 @@ document.addEventListener('DOMContentLoaded', async function() {
    page shipped with an empty tab name. Put them back after mount, and once more a beat
    later in case the mount runs twice. */
 (function () {
-  var TITLE = 'Lead Hunter - $67 - an Excel list of local businesses';
+  var TITLE = 'Lead Hunter - local businesses that need what you sell';
   var METAS = [
-    ['name', 'description', 'Every scraper hands you a raw dump. This one asks DNS before it writes the row. Nine tools in one folder, $67 paid once.'],
-    ['property', 'og:title', 'Lead Hunter - $67'],
-    ['property', 'og:description', 'An Excel list of local businesses, checked before you open it.'],
+    ['name', 'description', 'Type a trade and a city. Get local businesses with a broken website, a checked email, what to sell them and what to charge. Runs in Claude Code or Codex.'],
+    ['property', 'og:title', 'Local businesses with a broken website, and what to charge'],
+    ['property', 'og:description', 'Type a trade and a city. Every row carries a checked email, the fault on their site, and the job that fixes it.'],
     ['property', 'og:type', 'website'],
-    ['name', 'twitter:card', 'summary_large_image']
+    ['property', 'og:url', 'https://getleadhunter.io/'],
+    ['property', 'og:image', 'https://getleadhunter.io/og.png'],
+    ['name', 'twitter:card', 'summary_large_image'],
+    ['name', 'twitter:image', 'https://getleadhunter.io/og.png']
   ];
   function apply() {
     if (document.title !== TITLE) { document.title = TITLE; }
