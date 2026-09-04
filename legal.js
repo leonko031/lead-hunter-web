@@ -46,7 +46,7 @@
       '<h3>1. Who is responsible</h3>' +
       '<p>Leon Ilišin, Croatia, operating Lead Hunter at getleadhunter.io, is the controller for the data described here. Contact: <a href="mailto:' + MAIL + '">' + MAIL + '</a>.</p>' +
       '<h3>2. On the website</h3>' +
-      '<p><strong>Analytics.</strong> We use Rybbit, a privacy-friendly analytics service that does not set cookies. It records page views, which sections of the page you reach, which buttons you click, your approximate country, browser type and screen size, and the site that sent you. It does not store a profile that identifies you by name.</p>' +
+      '<p><strong>Analytics.</strong> We use Rybbit, a privacy-friendly analytics service that does not set cookies. It records page views, which sections of the page you reach, which buttons you click, your approximate country, browser type and screen size, and the site that sent you. It can also keep an anonymised replay of how the page was used (scrolls and clicks), with anything you type masked. It does not store a profile that identifies you by name.</p>' +
       '<p><strong>Advertising measurement.</strong> We use the Meta Pixel to see whether our advertising on Facebook and Instagram works. It sets cookies (_fbp and, if you arrived from a Meta ad, _fbc) and reports these events to Meta: that you viewed the page, that you clicked a buy button, and, if you buy, the purchase. Meta may link this to your Meta account under its own privacy policy. You can limit this in your Meta ad settings or by blocking the cookie in your browser; the site works without it.</p>' +
       '<p><strong>Server logs.</strong> The site is hosted on GitHub Pages, which keeps standard access logs for security.</p>' +
       '<h3>3. When you buy</h3>' +
