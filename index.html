@@ -38,11 +38,12 @@
   t.src=v;s=b.getElementsByTagName(e)[0];
   s.parentNode.insertBefore(t,s)}(window, document,'script',
   'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', '2271700780329849');
+  fbq('init', '1598676908587208');
   fbq('track', 'PageView');
+  fbq('track', 'ViewContent', {content_name: 'Lead Hunter', content_ids: ['leadhunter'], content_type: 'product', value: 67, currency: 'USD'});
   </script>
   <noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=2271700780329849&ev=PageView&noscript=1"
+  src="https://www.facebook.com/tr?id=1598676908587208&ev=PageView&noscript=1"
   /></noscript>
   <!-- End Meta Pixel Code -->
 </head>
@@ -447,12 +448,33 @@ document.addEventListener('DOMContentLoaded', async function() {
 })();
 </script>
 <script>
-/* Meta Pixel: fire InitiateCheckout when any Stripe checkout link is clicked (event delegation, works after the page renders) */
-document.addEventListener('click', function (e) {
-  var a = e.target && e.target.closest ? e.target.closest('a[href*="buy.stripe.com"]') : null;
-  if (!a || typeof window.fbq !== 'function') return;
-  window.fbq('track', 'InitiateCheckout', { content_name: 'Lead Hunter', value: 67, currency: 'USD' });
-}, true);
+/* Meta Pixel on checkout clicks. Two jobs:
+   1. fire InitiateCheckout;
+   2. hand Meta's browser identifiers (_fbp, _fbc) to Stripe through client_reference_id,
+      so the server can attach them to the Purchase it sends over the Conversions API.
+   base64url of "fbp|fbc" fits Stripe's allowed charset (A-Z a-z 0-9 - _) and the 200-char cap. */
+(function () {
+  function cookie(n) { var m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
+  function b64url(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  function ids() {
+    var fbp = cookie('_fbp'), fbc = cookie('_fbc');
+    if (!fbc) { var q = new URLSearchParams(location.search).get('fbclid'); if (q) fbc = 'fb.1.' + Date.now() + '.' + q; }
+    return { fbp: fbp, fbc: fbc };
+  }
+  document.addEventListener('click', function (e) {
+    var a = e.target && e.target.closest ? e.target.closest('a[href*="buy.stripe.com"]') : null;
+    if (!a) return;
+    try {
+      var x = ids(), ref = b64url((x.fbp || '') + '|' + (x.fbc || ''));
+      if (ref && ref.length <= 200 && a.href.indexOf('client_reference_id=') === -1) {
+        a.href += (a.href.indexOf('?') === -1 ? '?' : '&') + 'client_reference_id=' + ref;
+      }
+    } catch (err) {}
+    if (typeof window.fbq === 'function') {
+      window.fbq('track', 'InitiateCheckout', { content_name: 'Lead Hunter', content_ids: ['leadhunter'], content_type: 'product', num_items: 1, value: 67, currency: 'USD' });
+    }
+  }, true);
+})();
 </script>
 </body>
 </html>
