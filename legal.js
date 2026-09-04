@@ -126,7 +126,7 @@
     overlay.querySelectorAll('.lh-legal-nav button').forEach(function (b) { b.classList.toggle('on', b.getAttribute('data-lh-legal') === key); });
     lastFocus = document.activeElement;
     overlay.style.display = 'flex'; document.documentElement.style.overflow = 'hidden';
-    requestAnimationFrame(function () { overlay.classList.add('is-open'); });
+    setTimeout(function () { overlay.classList.add('is-open'); }, 0); // not rAF: background tabs never paint it
     overlay.querySelector('.lh-legal-x').focus();
     if (location.hash !== '#' + key) history.replaceState(null, '', '#' + key);
     if (window.rybbit && window.rybbit.event) window.rybbit.event('legal_open', { doc: key });
