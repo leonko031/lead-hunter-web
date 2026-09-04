@@ -26,12 +26,19 @@ src="https://www.facebook.com/tr?id=1598676908587208&ev=PageView&noscript=1"
 /></noscript>
 <!-- End Meta Pixel Code -->
 <script>
-/* Purchase. event_id is the Stripe session id, the same id the delivery
-   service sends from the server, so Meta counts one sale and not two. */
+/* Purchase, browser side. Rules that keep it honest:
+   1. eventID is the Stripe session id, the same id the delivery server sends, so Meta
+      merges the two into one sale (deduplication needs identical event_name + event_id);
+   2. no session id means we cannot prove a sale happened here, so nothing fires;
+   3. a refresh or back-navigation must not fire again, so the id is remembered per tab. */
 (function () {
   var sid = new URLSearchParams(location.search).get('session_id') || '';
-  var opts = sid ? { eventID: sid } : {};
-  fbq('track', 'Purchase', { value: 67.00, currency: 'USD', content_name: 'Lead Hunter', content_ids: ['leadhunter'], content_type: 'product', num_items: 1 }, opts);
+  if (!/^cs_(live|test)_[A-Za-z0-9]+$/.test(sid)) return;
+  try { if (sessionStorage.getItem('lh_purchase_sent') === sid) return; } catch (e) {}
+  fbq('track', 'Purchase',
+      { value: 67.00, currency: 'USD', content_name: 'Lead Hunter', content_ids: ['leadhunter'], content_type: 'product', num_items: 1, order_id: sid },
+      { eventID: sid });
+  try { sessionStorage.setItem('lh_purchase_sent', sid); } catch (e) {}
 })();
 </script>
 <style>
