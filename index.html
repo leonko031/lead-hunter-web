@@ -28,6 +28,11 @@
       This page requires JavaScript to display.
     </div>
   </noscript>
+  <!-- Rybbit analytics -->
+  <script
+      src="https://app.rybbit.io/api/script.js?siteId=d9ab33a0ac62"
+      defer
+  ></script>
   <!-- Meta Pixel Code -->
   <script>
   !function(f,b,e,v,n,t,s)
@@ -470,10 +475,38 @@ document.addEventListener('DOMContentLoaded', async function() {
         a.href += (a.href.indexOf('?') === -1 ? '?' : '&') + 'client_reference_id=' + ref;
       }
     } catch (err) {}
+    try {
+      var sec = a.closest('section'), k = sec && sec.querySelector('p');
+      var where = (k && /^\d\d \/ /.test(k.textContent.trim())) ? k.textContent.trim() : (a.closest('header') ? 'header' : (a.closest('[data-sticky]') ? 'sticky bar' : 'other'));
+      if (window.rybbit && window.rybbit.event) window.rybbit.event('checkout_click', { where: where.slice(0, 60), button: a.textContent.trim().slice(0, 60) });
+    } catch (err) {}
     if (typeof window.fbq === 'function') {
       window.fbq('track', 'InitiateCheckout', { content_name: 'Lead Hunter', content_ids: ['leadhunter'], content_type: 'product', num_items: 1, value: 67, currency: 'USD' });
     }
   }, true);
+})();
+</script>
+<script>
+/* Rybbit: how far people read. One section_view per section per pageview, fired when
+   half of the section is on screen. The bundle renders after load, so wait for sections. */
+(function () {
+  var seen = {}, tries = 0;
+  function arm() {
+    var secs = document.querySelectorAll('section');
+    if (!secs.length) { if (tries++ < 50) return setTimeout(arm, 300); return; }
+    if (!('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        var k = en.target.querySelector('p'), name = (k && /^\d\d \/ /.test(k.textContent.trim())) ? k.textContent.trim() : (en.target.querySelector('h1') ? '00 / hero' : '');
+        if (!name || seen[name]) return;
+        seen[name] = 1;
+        if (window.rybbit && window.rybbit.event) window.rybbit.event('section_view', { section: name.slice(0, 60) });
+      });
+    }, { threshold: 0.5 });
+    secs.forEach(function (s) { io.observe(s); });
+  }
+  arm();
 })();
 </script>
 </body>

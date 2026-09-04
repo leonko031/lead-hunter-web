@@ -8,6 +8,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<!-- Rybbit analytics -->
+<script
+    src="https://app.rybbit.io/api/script.js?siteId=d9ab33a0ac62"
+    defer
+></script>
 <!-- Meta Pixel Code -->
 <script>
 !function(f,b,e,v,n,t,s)
@@ -39,6 +44,9 @@ src="https://www.facebook.com/tr?id=1598676908587208&ev=PageView&noscript=1"
       { value: 67.00, currency: 'USD', content_name: 'Lead Hunter', content_ids: ['leadhunter'], content_type: 'product', num_items: 1, order_id: sid },
       { eventID: sid });
   try { sessionStorage.setItem('lh_purchase_sent', sid); } catch (e) {}
+  /* Rybbit sees the same sale, same id, so the funnel closes on it */
+  function ry() { if (window.rybbit && window.rybbit.event) window.rybbit.event('purchase', { order: sid, value: 67 }); else setTimeout(ry, 250); }
+  ry();
 })();
 </script>
 <style>
@@ -77,7 +85,7 @@ src="https://www.facebook.com/tr?id=1598676908587208&ev=PageView&noscript=1"
   <p class="kicker">Payment received</p>
   <h1>It is yours. Download the folder and run your first city.</h1>
   <p>The same link is in your inbox, so you can come back to it later. If it is not there in a few minutes, look in spam, then write to us.</p>
-  <a class="btn" href="https://leadhunter-delivery.fly.dev/d/RGtS4Uezidpq-DHqXc5iRSCvIZ6cvYFv">Download Lead Hunter</a>
+  <a class="btn" data-rybbit-event="download_click" href="https://leadhunter-delivery.fly.dev/d/RGtS4Uezidpq-DHqXc5iRSCvIZ6cvYFv">Download Lead Hunter</a>
   <div class="steps">
     <p><b>1.</b> Unzip the folder anywhere on your computer.</p>
     <p><b>2.</b> Open it in Claude Code or Codex.</p>
