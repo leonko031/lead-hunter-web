@@ -44,11 +44,11 @@ src="https://www.facebook.com/tr?id=1598676908587208&ev=PageView&noscript=1"
   if (!/^cs_(live|test)_[A-Za-z0-9]+$/.test(sid)) return;
   try { if (sessionStorage.getItem('lh_purchase_sent') === sid) return; } catch (e) {}
   fbq('track', 'Purchase',
-      { value: 67.00, currency: 'USD', content_name: 'Lead Hunter', content_ids: ['leadhunter'], content_type: 'product', num_items: 1, order_id: sid },
+      { value: 47.00, currency: 'USD', content_name: 'Lead Hunter', content_ids: ['leadhunter'], content_type: 'product', num_items: 1, order_id: sid },
       { eventID: sid });
   try { sessionStorage.setItem('lh_purchase_sent', sid); } catch (e) {}
   /* Rybbit sees the same sale, same id, so the funnel closes on it */
-  function ry() { if (window.rybbit && window.rybbit.event) window.rybbit.event('purchase', { order: sid, value: 67 }); else setTimeout(ry, 250); }
+  function ry() { if (window.rybbit && window.rybbit.event) window.rybbit.event('purchase', { order: sid, value: 47 }); else setTimeout(ry, 250); }
   ry();
 })();
 </script>
