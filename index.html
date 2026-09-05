@@ -463,7 +463,8 @@ document.addEventListener('DOMContentLoaded', async function() {
    3. carry the ad that brought this visitor (utm_content = ad set, utm_term = ad id, read from
       the landing URL and kept for the session) into the same reference and as UTM parameters,
       so every Stripe sale joins back to one ad by id. Join on ad id, never ad name.
-   base64url of "fbp|fbc|adset|adid" fits Stripe's allowed charset (A-Z a-z 0-9 - _) and the 200-char cap. */
+   base64url of "fbp|fbc|adset|adid" fits Stripe's allowed charset (A-Z a-z 0-9 - _) and the 200-char cap.
+   The click goes through the delivery server's /checkout, which creates the Checkout Session. */
 (function () {
   function cookie(n) { var m = document.cookie.match('(?:^|; )' + n + '=([^;]*)'); return m ? decodeURIComponent(m[1]) : ''; }
   function b64url(str) { return btoa(unescape(encodeURIComponent(str))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
@@ -491,13 +492,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     try {
       var x = ids(), adset = (utm.utm_content || '').replace(/\|/g, ' '), adid = (utm.utm_term || '').replace(/\|/g, ' ');
       var ref = b64url((x.fbp || '') + '|' + (x.fbc || '') + '|' + adset + '|' + adid);
-      if (ref && ref.length <= 200 && a.href.indexOf('client_reference_id=') === -1) {
-        a.href += (a.href.indexOf('?') === -1 ? '?' : '&') + 'client_reference_id=' + ref;
-      }
-      if (a.href.indexOf('utm_source=') === -1) {
-        var qs = [];
-        UTM.forEach(function (k) { if (utm[k]) qs.push(k + '=' + encodeURIComponent(utm[k])); });
-        if (qs.length) a.href += '&' + qs.join('&');
+      /* The server creates a Checkout Session (Managed Payments) with the ad attribution in its
+         metadata and sends the buyer to Stripe. The anchor's own href stays the Payment Link, so a
+         click still works without JavaScript, and the server falls back to that link if Stripe fails. */
+      if (a.href.indexOf('buy.stripe.com') !== -1) {
+        a.href = 'https://leadhunter-delivery.fly.dev/checkout?ref=' + encodeURIComponent(ref) +
+                 '&adset=' + encodeURIComponent(adset) + '&ad=' + encodeURIComponent(adid);
       }
     } catch (err) {}
     try {
